@@ -19,7 +19,6 @@ import {
   SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
 import { trpc } from "@/lib/trpc";
 import {
@@ -306,7 +305,7 @@ function DashboardLayoutContent({ children, setSidebarWidth }: DashboardLayoutCo
               </DropdownMenu>
             ) : (
               <a
-                href={getLoginUrl()}
+                href="/"
                 className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold transition-all w-full justify-center group-data-[collapsible=icon]:justify-center"
                 style={{
                   background: "linear-gradient(135deg, oklch(0.62 0.18 200 / 0.2), oklch(0.62 0.18 200 / 0.1))",
