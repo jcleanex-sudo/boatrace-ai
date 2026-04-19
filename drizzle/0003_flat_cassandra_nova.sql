@@ -1,1 +1,0 @@
-ALTER TABLE `race_before_info` ADD `stabilizer` tinyint DEFAULT 0;
