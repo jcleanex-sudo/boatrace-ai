@@ -1,0 +1,52 @@
+{
+  "feature_cols": [
+    "boatNumber",
+    "stadiumId",
+    "racerClassEnc",
+    "age",
+    "weight",
+    "nationalWinRate",
+    "national2Rate",
+    "national3Rate",
+    "localWinRate",
+    "local2Rate",
+    "motor2Rate",
+    "motor3Rate",
+    "boat2Rate",
+    "avgSt",
+    "flyingCount",
+    "lateCount",
+    "weatherEnc",
+    "windSpeed",
+    "waveHeight",
+    "exhibitionTime",
+    "circuitTime",
+    "tilt",
+    "winOdds",
+    "courseWinRate",
+    "courseTop2Rate",
+    "courseTop3Rate",
+    "recentWinRate",
+    "recentTop3Rate",
+    "recentAvgPlace"
+  ],
+  "le_class_classes": [
+    "B2"
+  ],
+  "le_weather_classes": [
+    "晴"
+  ],
+  "accuracy": 0.8294573643410853,
+  "auc": 0.7352501867064974,
+  "train_rows": 512,
+  "val_rows": 129,
+  "use_lgbm": true,
+  "use_ensemble": true,
+  "ensemble_models": [
+    "LightGBM",
+    "XGBoost",
+    "RandomForest"
+  ],
+  "has_course_features": true,
+  "has_recent_form": true
+}

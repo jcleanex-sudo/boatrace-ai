@@ -1,0 +1,55 @@
+{
+  "version": "7",
+  "dialect": "mysql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1775092325531,
+      "tag": "0000_classy_mojo",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1775092487310,
+      "tag": "0001_wealthy_the_phantom",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1775112511537,
+      "tag": "0002_perpetual_tana_nile",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1775115400979,
+      "tag": "0003_flat_cassandra_nova",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1775207206507,
+      "tag": "0004_nosy_pixie",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1775232458670,
+      "tag": "0005_bored_malcolm_colcord",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1775310958174,
+      "tag": "0006_magical_riptide",
+      "breakpoints": true
+    }
+  ]
+}

@@ -1,0 +1,323 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  /* カスタムカラー */
+  --color-ocean: var(--ocean);
+  --color-wave: var(--wave);
+  --color-coral: var(--coral);
+  --color-gold: var(--gold);
+  --color-foam: var(--foam);
+}
+
+:root {
+  --radius: 0.75rem;
+
+  /* ── 競艇・海テーマ カラーパレット ── */
+  /* ターコイズ（メインカラー） */
+  --primary: oklch(0.62 0.18 200);
+  --primary-foreground: oklch(0.99 0.005 200);
+
+  /* ディープネイビー（背景） */
+  --background: oklch(0.14 0.03 230);
+  --foreground: oklch(0.96 0.01 220);
+
+  /* カード（少し明るいネイビー） */
+  --card: oklch(0.19 0.03 230);
+  --card-foreground: oklch(0.96 0.01 220);
+
+  --popover: oklch(0.19 0.03 230);
+  --popover-foreground: oklch(0.96 0.01 220);
+
+  /* セカンダリ */
+  --secondary: oklch(0.25 0.04 230);
+  --secondary-foreground: oklch(0.88 0.01 220);
+
+  --muted: oklch(0.23 0.03 230);
+  --muted-foreground: oklch(0.62 0.03 220);
+
+  /* アクセント（コーラルピンク） */
+  --accent: oklch(0.70 0.18 20);
+  --accent-foreground: oklch(0.99 0.005 20);
+
+  --destructive: oklch(0.60 0.22 25);
+  --destructive-foreground: oklch(0.99 0.005 25);
+
+  --border: oklch(0.30 0.04 230);
+  --input: oklch(0.23 0.03 230);
+  --ring: oklch(0.62 0.18 200);
+
+  /* サイドバー */
+  --sidebar: oklch(0.16 0.04 230);
+  --sidebar-foreground: oklch(0.92 0.01 220);
+  --sidebar-primary: oklch(0.62 0.18 200);
+  --sidebar-primary-foreground: oklch(0.99 0.005 200);
+  --sidebar-accent: oklch(0.22 0.04 230);
+  --sidebar-accent-foreground: oklch(0.88 0.01 220);
+  --sidebar-border: oklch(0.26 0.04 230);
+  --sidebar-ring: oklch(0.62 0.18 200);
+
+  /* チャートカラー */
+  --chart-1: oklch(0.62 0.18 200);  /* ターコイズ */
+  --chart-2: oklch(0.70 0.18 20);   /* コーラル */
+  --chart-3: oklch(0.78 0.18 85);   /* ゴールド */
+  --chart-4: oklch(0.65 0.18 280);  /* パープル */
+  --chart-5: oklch(0.65 0.18 145);  /* グリーン */
+
+  /* カスタム */
+  --ocean: oklch(0.62 0.18 200);
+  --wave: oklch(0.55 0.15 210);
+  --coral: oklch(0.70 0.18 20);
+  --gold: oklch(0.78 0.18 85);
+  --foam: oklch(0.90 0.04 200);
+}
+
+/* dark class unused - always dark theme */
+.dark {
+  --primary: oklch(0.62 0.18 200);
+  --primary-foreground: oklch(0.99 0.005 200);
+  --background: oklch(0.14 0.03 230);
+  --foreground: oklch(0.96 0.01 220);
+  --card: oklch(0.19 0.03 230);
+  --card-foreground: oklch(0.96 0.01 220);
+  --popover: oklch(0.19 0.03 230);
+  --popover-foreground: oklch(0.96 0.01 220);
+  --secondary: oklch(0.25 0.04 230);
+  --secondary-foreground: oklch(0.88 0.01 220);
+  --muted: oklch(0.23 0.03 230);
+  --muted-foreground: oklch(0.62 0.03 220);
+  --accent: oklch(0.70 0.18 20);
+  --accent-foreground: oklch(0.99 0.005 20);
+  --destructive: oklch(0.60 0.22 25);
+  --destructive-foreground: oklch(0.99 0.005 25);
+  --border: oklch(0.30 0.04 230);
+  --input: oklch(0.23 0.03 230);
+  --ring: oklch(0.62 0.18 200);
+  --sidebar: oklch(0.16 0.04 230);
+  --sidebar-foreground: oklch(0.92 0.01 220);
+  --sidebar-primary: oklch(0.62 0.18 200);
+  --sidebar-primary-foreground: oklch(0.99 0.005 200);
+  --sidebar-accent: oklch(0.22 0.04 230);
+  --sidebar-accent-foreground: oklch(0.88 0.01 220);
+  --sidebar-border: oklch(0.26 0.04 230);
+  --sidebar-ring: oklch(0.62 0.18 200);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'M PLUS Rounded 1c', 'Noto Sans JP', 'Inter', sans-serif;
+    background-image:
+      radial-gradient(ellipse at 20% 50%, oklch(0.62 0.18 200 / 0.04) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 20%, oklch(0.70 0.18 20 / 0.03) 0%, transparent 50%);
+  }
+
+  /* ── 艇番カラー（競艇公式カラー） ── */
+  .boat-1 { background-color: #ffffff; color: #000000; border: 1px solid #ddd; }
+  .boat-2 { background-color: #1a1a2e; color: #ffffff; }
+  .boat-3 { background-color: #e53e3e; color: #ffffff; }
+  .boat-4 { background-color: #3182ce; color: #ffffff; }
+  .boat-5 { background-color: #d69e2e; color: #000000; }
+  .boat-6 { background-color: #38a169; color: #ffffff; }
+
+  /* ── 級別カラー ── */
+  .class-A1 { color: #f87171; font-weight: 700; }
+  .class-A2 { color: #fb923c; font-weight: 600; }
+  .class-B1 { color: #60a5fa; }
+  .class-B2 { color: #94a3b8; }
+
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  [type="button"]:not(:disabled),
+  [type="submit"]:not(:disabled),
+  [type="reset"]:not(:disabled),
+  a[href],
+  select:not(:disabled),
+  input[type="checkbox"]:not(:disabled),
+  input[type="radio"]:not(:disabled) {
+    @apply cursor-pointer;
+  }
+}
+
+@layer components {
+  .container {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .flex {
+    min-height: 0;
+    min-width: 0;
+  }
+
+  @media (min-width: 640px) {
+    .container {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .container {
+      padding-left: 2rem;
+      padding-right: 2rem;
+      max-width: 1280px;
+    }
+  }
+
+  /* ── 海・波テーマ カスタムコンポーネント ── */
+
+  /* グラデーションカード */
+  .ocean-card {
+    @apply rounded-2xl border border-border/50 bg-card/80 backdrop-blur-sm;
+    background-image: linear-gradient(135deg, oklch(0.19 0.03 230 / 0.9), oklch(0.17 0.04 235 / 0.9));
+    box-shadow: 0 4px 24px oklch(0.62 0.18 200 / 0.08), 0 1px 4px oklch(0 0 0 / 0.3);
+  }
+
+  /* プライマリグロー効果 */
+  .glow-primary {
+    box-shadow: 0 0 20px oklch(0.62 0.18 200 / 0.3), 0 0 40px oklch(0.62 0.18 200 / 0.1);
+  }
+
+  /* コーラルグロー */
+  .glow-coral {
+    box-shadow: 0 0 20px oklch(0.70 0.18 20 / 0.3), 0 0 40px oklch(0.70 0.18 20 / 0.1);
+  }
+
+  /* ゴールドグロー */
+  .glow-gold {
+    box-shadow: 0 0 20px oklch(0.78 0.18 85 / 0.4), 0 0 40px oklch(0.78 0.18 85 / 0.15);
+  }
+
+  /* 波アニメーション */
+  @keyframes wave-float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-4px); }
+  }
+
+  @keyframes shimmer {
+    0% { background-position: -200% center; }
+    100% { background-position: 200% center; }
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 8px oklch(0.62 0.18 200 / 0.3); }
+    50% { box-shadow: 0 0 20px oklch(0.62 0.18 200 / 0.6); }
+  }
+
+  .wave-float {
+    animation: wave-float 3s ease-in-out infinite;
+  }
+
+  /* シマーグラデーションテキスト */
+  .gradient-text {
+    background: linear-gradient(135deg, oklch(0.75 0.18 200), oklch(0.70 0.18 20), oklch(0.78 0.18 85));
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer 4s linear infinite;
+  }
+
+  /* ターコイズグラデーションボタン */
+  .btn-ocean {
+    background: linear-gradient(135deg, oklch(0.62 0.18 200), oklch(0.55 0.18 215));
+    @apply text-white font-semibold rounded-xl px-5 py-2.5 transition-all duration-200;
+    box-shadow: 0 4px 14px oklch(0.62 0.18 200 / 0.35);
+  }
+  .btn-ocean:hover {
+    background: linear-gradient(135deg, oklch(0.67 0.18 200), oklch(0.60 0.18 215));
+    box-shadow: 0 6px 20px oklch(0.62 0.18 200 / 0.5);
+    transform: translateY(-1px);
+  }
+
+  /* コーラルボタン */
+  .btn-coral {
+    background: linear-gradient(135deg, oklch(0.70 0.18 20), oklch(0.63 0.18 30));
+    @apply text-white font-semibold rounded-xl px-5 py-2.5 transition-all duration-200;
+    box-shadow: 0 4px 14px oklch(0.70 0.18 20 / 0.35);
+  }
+  .btn-coral:hover {
+    box-shadow: 0 6px 20px oklch(0.70 0.18 20 / 0.5);
+    transform: translateY(-1px);
+  }
+
+  /* バッジスタイル */
+  .badge-ocean {
+    @apply text-xs font-bold px-2.5 py-0.5 rounded-full;
+    background: oklch(0.62 0.18 200 / 0.2);
+    color: oklch(0.75 0.18 200);
+    border: 1px solid oklch(0.62 0.18 200 / 0.3);
+  }
+
+  .badge-coral {
+    @apply text-xs font-bold px-2.5 py-0.5 rounded-full;
+    background: oklch(0.70 0.18 20 / 0.2);
+    color: oklch(0.80 0.18 20);
+    border: 1px solid oklch(0.70 0.18 20 / 0.3);
+  }
+
+  .badge-gold {
+    @apply text-xs font-bold px-2.5 py-0.5 rounded-full;
+    background: oklch(0.78 0.18 85 / 0.2);
+    color: oklch(0.85 0.18 85);
+    border: 1px solid oklch(0.78 0.18 85 / 0.3);
+  }
+
+  /* セクションヘッダー */
+  .section-header {
+    @apply flex items-center gap-2 mb-4;
+  }
+  .section-header-icon {
+    @apply h-8 w-8 rounded-xl flex items-center justify-center;
+    background: linear-gradient(135deg, oklch(0.62 0.18 200 / 0.2), oklch(0.62 0.18 200 / 0.1));
+    border: 1px solid oklch(0.62 0.18 200 / 0.3);
+  }
+  .section-header-title {
+    @apply text-lg font-bold text-foreground;
+  }
+}
