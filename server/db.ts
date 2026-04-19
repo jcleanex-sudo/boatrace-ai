@@ -61,7 +61,7 @@ export async function getRaceEntries(raceDate: string, stadiumId: string, raceNu
   if (!db) return [];
   return db.select().from(raceEntries).where(
     and(
-      sql`DATE_FORMAT(${raceEntries.raceDate}, '%Y%m%d') = ${raceDate}`,
+      sql`TO_CHAR(${raceEntries.raceDate}, 'YYYYMMDD') = ${raceDate}`,
       eq(raceEntries.stadiumId, stadiumId),
       eq(raceEntries.raceNumber, raceNumber)
     )
@@ -74,7 +74,7 @@ export async function getRaceBeforeInfo(raceDate: string, stadiumId: string, rac
   if (!db) return [];
   return db.select().from(raceBeforeInfo).where(
     and(
-      sql`DATE_FORMAT(${raceBeforeInfo.raceDate}, '%Y%m%d') = ${raceDate}`,
+      sql`TO_CHAR(${raceBeforeInfo.raceDate}, 'YYYYMMDD') = ${raceDate}`,
       eq(raceBeforeInfo.stadiumId, stadiumId),
       eq(raceBeforeInfo.raceNumber, raceNumber)
     )
@@ -116,7 +116,7 @@ export async function getDailyHitSummary(raceDate: string) {
 
   // raceDate: YYYYMMDD形式
   const rows = await db.select().from(predictionLogs).where(
-    sql`DATE_FORMAT(${predictionLogs.raceDate}, '%Y%m%d') = ${raceDate}`
+    sql`TO_CHAR(${predictionLogs.raceDate}, 'YYYYMMDD') = ${raceDate}`
   ).orderBy(desc(predictionLogs.createdAt));
 
   const total = rows.length;
@@ -194,7 +194,7 @@ export async function upsertBankroll(raceDate: string) {
 
   // 当日の予想ログを集計
   const rows = await db.select().from(predictionLogs).where(
-    sql`DATE_FORMAT(${predictionLogs.raceDate}, '%Y%m%d') = ${raceDate}`
+    sql`TO_CHAR(${predictionLogs.raceDate}, 'YYYYMMDD') = ${raceDate}`
   );
 
   const totalBet = rows.reduce((sum, r) => sum + (r.betAmount ?? 0), 0);
