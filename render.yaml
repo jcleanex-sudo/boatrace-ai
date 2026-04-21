@@ -2,7 +2,7 @@ services:
   - type: web
     name: boatrace-ai
     env: node
-    buildCommand: npm install -g pnpm && pnpm install --no-frozen-lockfile && pnpm build
+    buildCommand: npm install -g pnpm && pnpm install --no-frozen-lockfile && pip3 install requests beautifulsoup4 lxml pandas scikit-learn lightgbm xgboost joblib && pnpm build
     startCommand: pnpm start
     envVars:
       - key: NODE_ENV
