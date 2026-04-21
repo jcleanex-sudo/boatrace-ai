@@ -12,23 +12,14 @@ import requests
 from datetime import datetime
 from bs4 import BeautifulSoup
 
-import mysql.connector
+import psycopg2
+import psycopg2.extras
 
 def get_db_connection():
     url = os.environ.get("DATABASE_URL", "")
-    # mysql://user:pass@host:port/dbname 形式をパース
-    m = re.match(r"mysql://([^:]+):([^@]+)@([^:/]+):?(\d+)?/(.+)", url)
-    if not m:
-        raise ValueError(f"Invalid DATABASE_URL: {url}")
-    user, password, host, port, database = m.groups()
-    return mysql.connector.connect(
-        host=host,
-        port=int(port or 3306),
-        user=user,
-        password=password,
-        database=database,
-        charset="utf8mb4",
-    )
+    conn = psycopg2.connect(url, cursor_factory=psycopg2.extras.RealDictCursor)
+    conn.autocommit = False
+    return conn
 
 def scrape_trifecta_odds(date: str, stadium_id: str, race_number: int) -> dict:
     """
