@@ -101,12 +101,13 @@ CREATE TABLE IF NOT EXISTS "bankroll" (
 
 CREATE TABLE IF NOT EXISTS "data_fetch_logs" (
   "id" serial PRIMARY KEY NOT NULL,
-  "fetchType" varchar(30) NOT NULL,
-  "raceDate" date,
-  "stadiumId" varchar(10),
-  "status" varchar(10) NOT NULL DEFAULT 'success',
-  "message" text,
-  "recordCount" integer DEFAULT 0,
+  "fetchType" varchar(32) NOT NULL,
+  "targetDate" date,
+  "stadiumId" varchar(2),
+  "raceNumber" smallint,
+  "status" varchar(16) NOT NULL,
+  "rowsAffected" integer,
+  "errorMessage" text,
   "createdAt" timestamp NOT NULL DEFAULT now()
 );
 
