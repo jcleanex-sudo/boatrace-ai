@@ -143,7 +143,7 @@ export async function getDataStatus() {
   const [resultsCount] = await db.select({ count: sql<number>`COUNT(*)` }).from(raceResults);
   const [entriesCount] = await db.select({ count: sql<number>`COUNT(*)` }).from(raceEntries);
   const [beforeInfoCount] = await db.select({ count: sql<number>`COUNT(*)` }).from(raceBeforeInfo);
-  const [lastResult] = await db.select({ maxDate: sql<string>`MAX(raceDate)` }).from(raceResults);
+  const [lastResult] = await db.select({ maxDate: sql<string>`MAX("raceDate")` }).from(raceResults);
 
   return {
     resultsCount: Number(resultsCount?.count ?? 0),
@@ -246,10 +246,10 @@ export async function getBankrollSummary() {
   const db = await getDb();
   if (!db) return null;
   const [row] = await db.select({
-    totalBet: sql<number>`SUM(totalBet)`,
-    totalPayout: sql<number>`SUM(totalPayout)`,
-    totalRaces: sql<number>`SUM(totalRaces)`,
-    hitRaces: sql<number>`SUM(hitRaces)`,
+    totalBet: sql<number>`SUM("totalBet")`,
+    totalPayout: sql<number>`SUM("totalPayout")`,
+    totalRaces: sql<number>`SUM("totalRaces")`,
+    hitRaces: sql<number>`SUM("hitRaces")`,
     days: sql<number>`COUNT(*)`,
   }).from(bankroll);
   if (!row) return null;
@@ -275,8 +275,8 @@ export async function getCurrentBankrollBalance() {
   const db = await getDb();
   if (!db) return 0;
   const [row] = await db.select({
-    totalBet: sql<number>`SUM(totalBet)`,
-    totalPayout: sql<number>`SUM(totalPayout)`,
+    totalBet: sql<number>`SUM("totalBet")`,
+    totalPayout: sql<number>`SUM("totalPayout")`,
   }).from(bankroll);
   if (!row) return 0;
   const totalBet = Number(row.totalBet ?? 0);
