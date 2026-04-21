@@ -167,7 +167,14 @@ export async function logDataFetch(data: {
   if (!db) return;
   await db.insert(dataFetchLogs).values({
     fetchType: data.fetchType,
-    targetDate: data.targetDate ? new Date(data.targetDate) : undefined,
+    targetDate: data.targetDate ? (() => {
+      const d = data.targetDate!;
+      // YYYYMMDD形式 or YYYY-MM-DD形式どちらにも対応
+      if (/^\d{8}$/.test(d)) {
+        return new Date(d.substring(0,4) + '-' + d.substring(4,6) + '-' + d.substring(6,8));
+      }
+      return new Date(d);
+    })() : undefined,
     stadiumId: data.stadiumId,
     raceNumber: data.raceNumber,
     status: data.status,
