@@ -244,10 +244,17 @@ async function startServer() {
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
   // tRPC API
+
   // ─── /api/schedule (Base44からのスケジュール取得用) ─────────────────────────
   app.get('/api/schedule', async (req: any, res: any) => {
     const date = (req.query.date as string) || new Date().toISOString().slice(0,10).replace(/-/g,'');
-    const GRADE_PATTERNS: Array<[RegExp, string]> = [
+    const STADIUM_NAMES: Record<string, string> = {
+      '01':'桐生','02':'戸田','03':'江戸川','04':'平和島','05':'多摩川','06':'浜名湖',
+      '07':'蒲郡','08':'常滑','09':'津','10':'三国','11':'びわこ','12':'住之江',
+      '13':'尼崎','14':'鳴門','15':'丸亀','16':'児島','17':'宮島','18':'徳山',
+      '19':'下関','20':'若松','21':'芦屋','22':'福岡','23':'唐津','24':'大村',
+    };
+    const GRADE_PATTERNS: [RegExp, string][] = [
       [/SG|グランプリ|クラシック|ダービー|メモリアル|チャンピオンシップ|オールスター|グランドチャンピオン|BBCトーナメント|チャレンジカップ/, 'SG'],
       [/周年|総理大臣杯|笹川賞|モーターボート記念|地域対抗|最高峰|王座/, 'G1'],
       [/G2|競艇名人|オーシャン/, 'G2'],
@@ -258,10 +265,11 @@ async function startServer() {
       const response = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' }, signal: AbortSignal.timeout(20000) });
       const html = await response.text();
       const jcdMatches = [...html.matchAll(/jcd=(\d{2})/g)];
-      const stadiums = [...new Set(jcdMatches.map((m) => m[1]))].slice(0, 12);
+      const stadiums = [...new Set(jcdMatches.map((m: RegExpMatchArray) => m[1]))].slice(0, 12);
       const grade_map: Record<string, string> = {};
       for (const sid of stadiums) {
-        const raceNameRegex = new RegExp(`jcd=${sid}&amp;hd=${date}">(.*?)<\\/a>`, 'g');
+        const escapedSid = sid;
+        const raceNameRegex = new RegExp(`jcd=${escapedSid}&amp;hd=${date}">(.*?)<\\/a>`, 'g');
         const nameMatches = [...html.matchAll(raceNameRegex)];
         for (const match of nameMatches) {
           const raceName = match[1];
@@ -274,11 +282,95 @@ async function startServer() {
           if (grade_map[sid]) break;
         }
       }
-      res.json({ stadiums, grade_map });
+      res.json({ stadiums, grade_map, stadium_names: STADIUM_NAMES });
     } catch (e: any) {
       res.status(500).json({ error: String(e), stadiums: [], grade_map: {} });
     }
   });
+
+
+  // ─── /api/racer-course (選手コース別成績取得) ──────────────────────────────
+  app.get('/api/racer-course', async (req: any, res: any) => {
+    const toban = req.query.toban as string;
+    if (!toban) return res.status(400).json({ error: 'toban is required' });
+    try {
+      const url = `https://www.boatrace.jp/owpc/pc/data/racersearch/course?toban=${toban}`;
+      const response = await fetch(url, {
+        headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' },
+        signal: AbortSignal.timeout(10000)
+      });
+      const html = await response.text();
+      // コース別成績テーブルをパース
+      const courseStats: Record<number, { attempts: number; win: number; place2: number; place3: number; winRate: number }> = {};
+      // 1コース〜6コースの勝率・連対率を正規表現で抽出
+      const tableMatch = html.match(/コース別出走成績[\s\S]*?<\/table>/);
+      if (tableMatch) {
+        const rows = tableMatch[0].match(/<tr[\s\S]*?<\/tr>/g) || [];
+        let courseNum = 1;
+        for (const row of rows) {
+          const cells = [...row.matchAll(/<td[^>]*>([\s\S]*?)<\/td>/g)].map(m =>
+            m[1].replace(/<[^>]+>/g, '').replace(/&nbsp;/g, '').trim()
+          );
+          if (cells.length >= 4) {
+            const attempts = parseInt(cells[0]) || 0;
+            const win = parseInt(cells[1]) || 0;
+            const winRate = attempts > 0 ? win / attempts : 0;
+            const place2 = parseInt(cells[2]) || 0;
+            const place3 = parseInt(cells[3]) || 0;
+            if (courseNum <= 6) {
+              courseStats[courseNum] = { attempts, win, place2, place3, winRate };
+              courseNum++;
+            }
+          }
+        }
+      }
+      // フォールバック: 数値パターンで抽出
+      if (Object.keys(courseStats).length === 0) {
+        const numPattern = /(\d+(?:\.\d+)?)/g;
+        const allNums = [...html.matchAll(/1コース|2コース|3コース|4コース|5コース|6コース/g)];
+        res.json({ toban, courseStats: {}, raw_found: allNums.length });
+      } else {
+        res.json({ toban, courseStats });
+      }
+    } catch (e: any) {
+      res.status(500).json({ error: String(e), toban, courseStats: {} });
+    }
+  });
+
+  // ─── /api/racelist (出走表取得) ────────────────────────────────────────────
+  app.get('/api/racelist', async (req: any, res: any) => {
+    const { jcd, hd, rno } = req.query;
+    if (!jcd || !hd || !rno) return res.status(400).json({ error: 'jcd, hd, rno are required' });
+    try {
+      const url = `https://www.boatrace.jp/owpc/pc/race/racelist?jcd=${jcd}&hd=${hd}&rno=${rno}`;
+      const response = await fetch(url, {
+        headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' },
+        signal: AbortSignal.timeout(15000)
+      });
+      const html = await response.text();
+      res.send(html);
+    } catch (e: any) {
+      res.status(500).json({ error: String(e) });
+    }
+  });
+
+  // ─── /api/beforeinfo (直前情報取得) ───────────────────────────────────────
+  app.get('/api/beforeinfo', async (req: any, res: any) => {
+    const { jcd, hd, rno } = req.query;
+    if (!jcd || !hd || !rno) return res.status(400).json({ error: 'jcd, hd, rno are required' });
+    try {
+      const url = `https://www.boatrace.jp/owpc/pc/race/beforeinfo?jcd=${jcd}&hd=${hd}&rno=${rno}`;
+      const response = await fetch(url, {
+        headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' },
+        signal: AbortSignal.timeout(15000)
+      });
+      const html = await response.text();
+      res.send(html);
+    } catch (e: any) {
+      res.status(500).json({ error: String(e) });
+    }
+  });
+
   app.use(
     "/api/trpc",
     createExpressMiddleware({
