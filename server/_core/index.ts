@@ -246,7 +246,41 @@ async function startServer() {
   // tRPC API
   app.use(
     "/api/trpc",
-    createExpressMiddleware({
+    // ─── /api/schedule (Base44からのスケジュール取得用) ─────────────────────────
+  app.get('/api/schedule', async (req: any, res: any) => {
+    const date = (req.query.date as string) || new Date().toISOString().slice(0,10).replace(/-/g,'');
+    const GRADE_PATTERNS: [RegExp, string][] = [
+      [/SG|グランプリ|クラシック|ダービー|メモリアル|チャンピオンシップ|オールスター|グランドチャンピオン|BBCトーナメント|チャレンジカップ/, 'SG'],
+      [/周年|総理大臣杯|笹川賞|モーターボート記念|地域対抗|最高峰|王座/, 'G1'],
+      [/G2|競艇名人|オーシャン/, 'G2'],
+      [/マスターズ|レディース|女子|オールレディース|クイーン|ヴィーナス|カップ|サッポロ|記念|節/, 'G3'],
+    ];
+    try {
+      const url = `https://www.boatrace.jp/owpc/pc/race/index?hd=${date}`;
+      const response = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' }, signal: AbortSignal.timeout(20000) });
+      const html = await response.text();
+      const jcdMatches = [...html.matchAll(/jcd=(\d{2})/g)];
+      const stadiums = [...new Set(jcdMatches.map((m: RegExpMatchArray) => m[1]))].slice(0, 12);
+      const grade_map: Record<string, string> = {};
+      for (const sid of stadiums) {
+        const raceNameRegex = new RegExp(`jcd=${sid}&amp;hd=${date}">(.*?)<\\/a>`, 'g');
+        const nameMatches = [...html.matchAll(raceNameRegex)];
+        for (const match of nameMatches) {
+          const raceName = match[1];
+          for (const [pattern, grade] of GRADE_PATTERNS) {
+            if (pattern.test(raceName)) {
+              grade_map[sid] = `${grade}（${raceName}）`;
+              break;
+            }
+          }
+          if (grade_map[sid]) break;
+        }
+      }
+      res.json({ stadiums, grade_map });
+    } catch (e: any) {
+      res.status(500).json({ error: String(e), stadiums: [], grade_map: {} });
+    }
+  });createExpressMiddleware({
       router: appRouter,
       createContext,
     })
