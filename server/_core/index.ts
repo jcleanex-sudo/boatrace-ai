@@ -280,7 +280,9 @@ async function startServer() {
     } catch (e: any) {
       res.status(500).json({ error: String(e), stadiums: [], grade_map: {} });
     }
-  });createExpressMiddleware({
+  });
+  app.use(
+    createExpressMiddleware({
       router: appRouter,
       createContext,
     })
