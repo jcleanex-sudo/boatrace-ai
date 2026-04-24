@@ -249,7 +249,7 @@ async function startServer() {
     // ─── /api/schedule (Base44からのスケジュール取得用) ─────────────────────────
   app.get('/api/schedule', async (req: any, res: any) => {
     const date = (req.query.date as string) || new Date().toISOString().slice(0,10).replace(/-/g,'');
-    const GRADE_PATTERNS: [RegExp, string][] = [
+    const GRADE_PATTERNS: Array<[RegExp, string]> = [
       [/SG|グランプリ|クラシック|ダービー|メモリアル|チャンピオンシップ|オールスター|グランドチャンピオン|BBCトーナメント|チャレンジカップ/, 'SG'],
       [/周年|総理大臣杯|笹川賞|モーターボート記念|地域対抗|最高峰|王座/, 'G1'],
       [/G2|競艇名人|オーシャン/, 'G2'],
@@ -260,7 +260,7 @@ async function startServer() {
       const response = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' }, signal: AbortSignal.timeout(20000) });
       const html = await response.text();
       const jcdMatches = [...html.matchAll(/jcd=(\d{2})/g)];
-      const stadiums = [...new Set(jcdMatches.map((m: RegExpMatchArray) => m[1]))].slice(0, 12);
+      const stadiums = [...new Set(jcdMatches.map((m) => m[1]))].slice(0, 12);
       const grade_map: Record<string, string> = {};
       for (const sid of stadiums) {
         const raceNameRegex = new RegExp(`jcd=${sid}&amp;hd=${date}">(.*?)<\\/a>`, 'g');
