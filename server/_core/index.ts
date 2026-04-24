@@ -244,9 +244,7 @@ async function startServer() {
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
   // tRPC API
-  app.use(
-    "/api/trpc",
-    // ─── /api/schedule (Base44からのスケジュール取得用) ─────────────────────────
+  // ─── /api/schedule (Base44からのスケジュール取得用) ─────────────────────────
   app.get('/api/schedule', async (req: any, res: any) => {
     const date = (req.query.date as string) || new Date().toISOString().slice(0,10).replace(/-/g,'');
     const GRADE_PATTERNS: Array<[RegExp, string]> = [
@@ -282,6 +280,7 @@ async function startServer() {
     }
   });
   app.use(
+    "/api/trpc",
     createExpressMiddleware({
       router: appRouter,
       createContext,
