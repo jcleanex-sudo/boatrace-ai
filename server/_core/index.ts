@@ -371,6 +371,66 @@ async function startServer() {
     }
   });
 
+
+  // ─── /api/save-prediction (予想をNeonDBのrace_resultsに保存) ───────────────
+  app.post('/api/save-prediction', async (req: any, res: any) => {
+    const { date, stadiumId, stadiumName, raceNumber, predictedCombos, clientId } = req.body;
+    if (!date || !stadiumId || !stadiumName || !raceNumber) {
+      return res.status(400).json({ error: 'date, stadiumId, stadiumName, raceNumber are required' });
+    }
+    try {
+      const { savePredictionLog } = await import('../db');
+      const id = await savePredictionLog({
+        date,
+        stadiumId,
+        stadiumName,
+        raceNumber: String(raceNumber),
+        predictions: predictedCombos ? predictedCombos.split(',').map((c: string) => ({ combo: c.trim(), category: 'honsen' })) : [],
+        clientId: clientId || '001',
+        actualResult: null,
+        actualPayout: null,
+      });
+      res.json({ success: true, id });
+    } catch (e: any) {
+      console.error('[save-prediction] Error:', e.message);
+      res.status(500).json({ success: false, error: String(e.message) });
+    }
+  });
+
+  // ─── /api/result (レース結果を照合・更新) ────────────────────────────────
+  app.post('/api/result', async (req: any, res: any) => {
+    const { date, stadiumId, raceNumber } = req.body;
+    if (!date || !stadiumId || !raceNumber) {
+      return res.status(400).json({ error: 'date, stadiumId, raceNumber are required' });
+    }
+    try {
+      // ボートレース公式から結果取得
+      const url = `https://www.boatrace.jp/owpc/pc/race/raceresult?rno=${raceNumber}&jcd=${stadiumId}&hd=${date}`;
+      const response = await fetch(url, {
+        headers: { 'User-Agent': 'Mozilla/5.0' },
+        signal: AbortSignal.timeout(15000)
+      });
+      const html = await response.text();
+      
+      // 3連単パース
+      const trifectaMatch = html.match(/3連単[\s\S]*?(\d)-(\d)-(\d)[\s\S]*?[¥￥]([\d,]+)/);
+      let trifectaCombo = null;
+      let trifectaPayout = null;
+      if (trifectaMatch) {
+        trifectaCombo = `${trifectaMatch[1]}-${trifectaMatch[2]}-${trifectaMatch[3]}`;
+        trifectaPayout = parseInt(trifectaMatch[4].replace(/,/g, ''));
+      }
+      
+      if (!trifectaCombo) {
+        return res.json({ success: false, error: 'result_not_found', date, stadiumId, raceNumber });
+      }
+      
+      res.json({ success: true, trifectaCombo, trifectaPayout, date, stadiumId, raceNumber });
+    } catch (e: any) {
+      res.status(500).json({ success: false, error: String(e.message) });
+    }
+  });
+
   app.use(
     "/api/trpc",
     createExpressMiddleware({
