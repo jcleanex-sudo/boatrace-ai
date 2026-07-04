@@ -35,6 +35,7 @@ import { STADIUMS } from "@shared/boatrace";
 const execFileAsync = promisify(execFile);
 const SCRIPTS_DIR = path.join(process.cwd(), "scripts");
 const PYTHON_DEPS_DIR = path.resolve(process.cwd(), ".python-packages");
+const PYTHON_PATH = process.env.PATH || "/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin";
 
 // Pythonバイナリを動的に解決（本番環境でのENOENTエラー対策）
 function resolvePythonBin(): string {
@@ -48,7 +49,7 @@ function resolvePythonBin(): string {
     try {
       const result = execFileSync("which", [name], {
         encoding: "utf8",
-        env: { PATH: "/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin" },
+        env: { PATH: PYTHON_PATH },
         timeout: 3000,
       }).trim();
       if (result) {
@@ -92,7 +93,7 @@ async function runPython(script: string, args: string[], timeoutMs = 120_000): P
   // ホワイトリスト方式: Python関連の環境変数を全て除外し、必要最低限のみ渡す
   // OTEL/PYTHONPATH/PYTHONHOME/VIRTUAL_ENV/UV_*などがPython3.13を引き込む原因
   const env: Record<string, string> = {
-    PATH: "/usr/bin:/bin:/usr/local/bin",
+    PATH: PYTHON_PATH,
     HOME: process.env.HOME || "/home/ubuntu",
     TMPDIR: process.env.TMPDIR || "/tmp",
     PYTHONPATH: PYTHON_DEPS_DIR,

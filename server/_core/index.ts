@@ -20,12 +20,13 @@ const execFileAsync = promisify(execFile);
 const SCRIPTS_DIR = path.resolve(process.cwd(), "scripts");
 const PYTHON_BIN = process.env.PYTHON_BIN || "python3";
 const PYTHON_DEPS_DIR = path.resolve(process.cwd(), ".python-packages");
+const PYTHON_PATH = process.env.PATH || "/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin";
 
 /** Pythonスクリプトを実行する共通ヘルパー */
 async function runScheduledPython(script: string, args: string[]): Promise<{ stdout: string; stderr: string }> {
   const scriptPath = path.join(SCRIPTS_DIR, script);
   const env: Record<string, string> = {
-    PATH: "/usr/bin:/bin:/usr/local/bin",
+    PATH: PYTHON_PATH,
     HOME: process.env.HOME || "/home/ubuntu",
     TMPDIR: process.env.TMPDIR || "/tmp",
     PYTHONPATH: PYTHON_DEPS_DIR,
