@@ -3,4 +3,4 @@ dist/
 .env
 .env.local
 *.log
-models/*.pkl
+__pycache__/

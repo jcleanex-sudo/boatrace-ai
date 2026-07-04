@@ -31,15 +31,22 @@
     "recentAvgPlace"
   ],
   "le_class_classes": [
+    "A1",
+    "A2",
+    "B1",
     "B2"
   ],
   "le_weather_classes": [
-    "晴"
+    "晴",
+    "曇",
+    "雨",
+    "雪"
   ],
-  "accuracy": 0.8294573643410853,
-  "auc": 0.7352501867064974,
-  "train_rows": 512,
-  "val_rows": 129,
+  "accuracy": 0.8661239086188203,
+  "auc": 0.8295068729250543,
+  "train_rows": 210280,
+  "val_rows": 52571,
+  "total_rows": 262851,
   "use_lgbm": true,
   "use_ensemble": true,
   "ensemble_models": [
@@ -48,5 +55,11 @@
     "RandomForest"
   ],
   "has_course_features": true,
-  "has_recent_form": true
+  "has_recent_form": true,
+  "data_range": "20250715 〜 20260506",
+  "honmei_hit_rate": 55.90047107138544,
+  "honsen_hit_rate": 24.229979466119097,
+  "estimated_recovery_rate": 2059.5482546201233,
+  "version": "v2",
+  "trained_at": "2026-05-06 18:00"
 }

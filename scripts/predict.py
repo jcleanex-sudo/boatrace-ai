@@ -83,7 +83,7 @@ def load_model():
         return None, None
     with open(model_path, "rb") as f:
         model = pickle.load(f)
-    with open(meta_path, "r") as f:
+    with open(meta_path, "r", encoding="utf-8") as f:
         meta = json.load(f)
     return model, meta
 

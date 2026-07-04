@@ -406,7 +406,7 @@ def train(conn, use_ensemble: bool = True, use_optimize: bool = False):
         "has_recent_form": True,
     }
     meta_path = os.path.join(MODEL_DIR, "model_meta.json")
-    with open(meta_path, "w") as f:
+    with open(meta_path, "w", encoding="utf-8") as f:
         json.dump(meta, f, ensure_ascii=False, indent=2)
 
     print(f"  Models saved to {MODEL_DIR}", flush=True)
