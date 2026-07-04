@@ -2,7 +2,7 @@ import "dotenv/config";
 import express from "express";
 import { createServer } from "http";
 import net from "net";
-import { execFile, execFileSync } from "child_process";
+import { execFile } from "child_process";
 import { promisify } from "util";
 import path from "path";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
@@ -205,23 +205,7 @@ function startReturnRateAlertScheduler() {
 
 // Pythonスクリプトの依存パッケージを自動インストール
 function ensurePythonDeps() {
-  const reqFile = path.resolve(process.cwd(), "scripts/requirements.txt");
-  try {
-    execFileSync(PYTHON_BIN, [
-      "-m",
-      "pip",
-      "install",
-      "--target",
-      PYTHON_DEPS_DIR,
-      "--upgrade",
-      "-q",
-      "-r",
-      reqFile,
-    ], { stdio: "pipe" });
-    console.log("[Python] Dependencies verified.");
-  } catch (e) {
-    console.warn("[Python] Failed to install dependencies:", (e as Error).message);
-  }
+  console.log(`[Python] Using project dependencies from ${PYTHON_DEPS_DIR}`);
 }
 
 function isPortAvailable(port: number): Promise<boolean> {

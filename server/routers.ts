@@ -35,7 +35,6 @@ import { STADIUMS } from "@shared/boatrace";
 const execFileAsync = promisify(execFile);
 const SCRIPTS_DIR = path.join(process.cwd(), "scripts");
 const PYTHON_DEPS_DIR = path.resolve(process.cwd(), ".python-packages");
-let pythonDepsVerified = false;
 
 // Pythonバイナリを動的に解決（本番環境でのENOENTエラー対策）
 function resolvePythonBin(): string {
@@ -82,58 +81,11 @@ function resolvePythonBin(): string {
 }
 const PYTHON_BIN = resolvePythonBin();
 
-function ensurePythonDeps(pythonBin: string) {
-  if (pythonDepsVerified) return;
-
-  const reqFile = path.resolve(process.cwd(), "scripts/requirements.txt");
-  const env: NodeJS.ProcessEnv = {
-    ...process.env,
-    PATH: process.env.PATH || "/usr/bin:/bin:/usr/local/bin",
-    PYTHONPATH: PYTHON_DEPS_DIR,
-  };
-
-  try {
-    execFileSync(pythonBin, ["-c", "import numpy, pandas, sklearn, lightgbm, xgboost, joblib, lxml"], {
-      env,
-      timeout: 30_000,
-      stdio: "pipe",
-    });
-    pythonDepsVerified = true;
-    return;
-  } catch {
-    // Fall through and install into the project-local package directory.
-  }
-
-  try {
-    execFileSync(pythonBin, [
-      "-m",
-      "pip",
-      "install",
-      "--target",
-      PYTHON_DEPS_DIR,
-      "--upgrade",
-      "-q",
-      "-r",
-      reqFile,
-    ], {
-      env,
-      timeout: 300_000,
-      stdio: "pipe",
-    });
-    pythonDepsVerified = true;
-    console.log("[Python] Dependencies verified for tRPC runtime.");
-  } catch (err: any) {
-    const stderr = Buffer.isBuffer(err.stderr) ? err.stderr.toString("utf8") : "";
-    console.warn("[Python] Failed to verify dependencies for tRPC runtime:", stderr || err.message);
-  }
-}
-
 // Pythonスクリプトを実行するヘルパー
 async function runPython(script: string, args: string[], timeoutMs = 120_000): Promise<{ stdout: string; stderr: string }> {
   // 動的に解決したPythonバイナリを使用（本番環境でのENOENTエラー対策）
   const pythonBin = PYTHON_BIN;
   const scriptPath = path.join(SCRIPTS_DIR, script);
-  ensurePythonDeps(pythonBin);
   // 引数を配列として渡す（シェルインジェクション回避）
   const scriptArgs = args.flatMap(a => a.split(" "));
   console.log(`[runPython] CMD: ${pythonBin} ${scriptPath} ${scriptArgs.join(' ')}`);
