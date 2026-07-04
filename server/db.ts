@@ -138,18 +138,24 @@ export async function getDailyHitSummary(raceDate: string) {
 // ─── Data Status ──────────────────────────────────────────────────────────────
 export async function getDataStatus() {
   const db = await getDb();
-  if (!db) return { resultsCount: 0, entriesCount: 0, beforeInfoCount: 0, lastResultDate: null };
+  if (!db) return { resultsCount: 0, entriesCount: 0, beforeInfoCount: 0, lastResultDate: null, latestEntry: null };
 
   const [resultsCount] = await db.select({ count: sql<number>`COUNT(*)` }).from(raceResults);
   const [entriesCount] = await db.select({ count: sql<number>`COUNT(*)` }).from(raceEntries);
   const [beforeInfoCount] = await db.select({ count: sql<number>`COUNT(*)` }).from(raceBeforeInfo);
   const [lastResult] = await db.select({ maxDate: sql<string>`MAX("raceDate")` }).from(raceResults);
+  const [latestEntry] = await db.select({
+    raceDate: raceEntries.raceDate,
+    stadiumId: raceEntries.stadiumId,
+    raceNumber: raceEntries.raceNumber,
+  }).from(raceEntries).orderBy(desc(raceEntries.raceDate), desc(raceEntries.createdAt)).limit(1);
 
   return {
     resultsCount: Number(resultsCount?.count ?? 0),
     entriesCount: Number(entriesCount?.count ?? 0),
     beforeInfoCount: Number(beforeInfoCount?.count ?? 0),
     lastResultDate: lastResult?.maxDate ?? null,
+    latestEntry: latestEntry ?? null,
   };
 }
 
