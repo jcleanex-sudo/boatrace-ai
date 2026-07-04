@@ -90,7 +90,6 @@ async function runPython(script: string, args: string[], timeoutMs = 120_000): P
     PATH: "/usr/bin:/bin:/usr/local/bin",
     HOME: process.env.HOME || "/home/ubuntu",
     TMPDIR: process.env.TMPDIR || "/tmp",
-    PYTHONNOUSERSITE: "1",
     // アプリケーション固有の環境変数のみ渡す
     ...(process.env.DATABASE_URL ? { DATABASE_URL: process.env.DATABASE_URL } : {}),
     ...(process.env.SSL_CERT_FILE ? { SSL_CERT_FILE: process.env.SSL_CERT_FILE } : {}),

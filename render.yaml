@@ -2,7 +2,7 @@ services:
   - type: web
     name: boatrace-ai
     env: node
-    buildCommand: npm install -g pnpm && pnpm install --no-frozen-lockfile && pip3 install -r scripts/requirements.txt && pnpm build
+    buildCommand: npm install -g pnpm && pnpm install --no-frozen-lockfile && python3 -m pip install --user -r scripts/requirements.txt && pnpm build
     startCommand: pnpm start
     envVars:
       - key: NODE_ENV
