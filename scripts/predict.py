@@ -238,7 +238,7 @@ def load_race_data(conn, race_date: str, stadium_id: str, race_number: int) -> l
             re."motorNumber", re."boatNumber2",
             rb."exhibitionTime", rb."circuitTime", rb.tilt, rb."startTime", rb."winOdds",
             rb."trifectaOdds", rb."startCourse",
-            COALESCE(rb.stabilizer, 0) AS stabilizer,
+            COALESCE(rb.stabilizer, false) AS stabilizer,
             COALESCE(rb.weather, re.weather) AS weather,
             COALESCE(rb."windDirection", re."windDirection") AS "windDirection",
             COALESCE(rb."windSpeed", re."windSpeed") AS "windSpeed",
