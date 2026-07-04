@@ -200,7 +200,7 @@ function startReturnRateAlertScheduler() {
 function ensurePythonDeps() {
   const reqFile = path.resolve(process.cwd(), "scripts/requirements.txt");
   try {
-    execSync(`sudo pip3 install -q -r "${reqFile}"`, { stdio: "pipe" });
+    execSync(`${PYTHON_BIN} -m pip install --user -q -r "${reqFile}"`, { stdio: "pipe" });
     console.log("[Python] Dependencies verified.");
   } catch (e) {
     console.warn("[Python] Failed to install dependencies:", (e as Error).message);
