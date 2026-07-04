@@ -2,7 +2,7 @@ services:
   - type: web
     name: boatrace-ai
     env: node
-    buildCommand: npm install -g pnpm && pnpm install --no-frozen-lockfile && python3 -m pip install --target .python-packages --upgrade -r scripts/requirements.txt && pnpm build
+    buildCommand: npm install -g pnpm && pnpm install --no-frozen-lockfile && /usr/bin/python3 -m pip install --target .python-packages --upgrade -r scripts/requirements.txt && pnpm build
     startCommand: pnpm start
     envVars:
       - key: NODE_ENV
@@ -16,6 +16,6 @@ services:
       - key: OWNER_OPEN_ID
         sync: false
       - key: PYTHON_BIN
-        value: python3
+        value: /usr/bin/python3
       - key: BETAKO_PUBLIC_ENABLED
         value: "true"

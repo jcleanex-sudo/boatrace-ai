@@ -1,4 +1,5 @@
 import { spawnSync } from "node:child_process";
+import { rmSync } from "node:fs";
 import path from "node:path";
 
 const shouldInstall =
@@ -13,9 +14,10 @@ if (!shouldInstall) {
 
 const depsDir = path.resolve(process.cwd(), ".python-packages");
 const reqFile = path.resolve(process.cwd(), "scripts/requirements.txt");
-const pythonBin = process.env.PYTHON_BIN || "python3";
+const pythonBin = process.env.PYTHON_BIN || "/usr/bin/python3";
 
 console.log(`[Python] Installing dependencies into ${depsDir}`);
+rmSync(depsDir, { recursive: true, force: true });
 
 const result = spawnSync(
   pythonBin,
