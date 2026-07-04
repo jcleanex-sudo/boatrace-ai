@@ -226,7 +226,7 @@ def select_exacta_predictions(win_probs: dict, entries: list) -> list:
 
 def load_race_data(conn, race_date: str, stadium_id: str, race_number: int) -> list:
     """出走表 + 直前情報を取得"""
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor()
     cursor.execute("""
         SELECT
             re.boatNumber, re.racerNumber, re.racerName, re.racerClass,
