@@ -43,7 +43,7 @@ function resolvePythonBin(): string {
   }
 
   // whichコマンドでPATHから検索（本番環境のPATHに対応）
-  const names = ["python3.11", "python3", "python"];
+  const names = ["python3", "python3.11", "python"];
   for (const name of names) {
     try {
       const result = execFileSync("which", [name], {
@@ -61,10 +61,10 @@ function resolvePythonBin(): string {
   }
   // フォールバック: フルパス候補を順にチェック
   const candidates = [
-    "/usr/bin/python3.11",
-    "/usr/local/bin/python3.11",
     "/usr/bin/python3",
     "/usr/local/bin/python3",
+    "/usr/bin/python3.11",
+    "/usr/local/bin/python3.11",
     "/usr/bin/python",
   ];
   for (const p of candidates) {
