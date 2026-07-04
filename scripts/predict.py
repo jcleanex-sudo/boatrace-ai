@@ -229,37 +229,37 @@ def load_race_data(conn, race_date: str, stadium_id: str, race_number: int) -> l
     cursor = conn.cursor()
     cursor.execute("""
         SELECT
-            re.boatNumber, re.racerNumber, re.racerName, re.racerClass,
+            re."boatNumber", re."racerNumber", re."racerName", re."racerClass",
             re.age, re.weight, re.branch,
-            re.nationalWinRate, re.national2Rate, re.national3Rate,
-            re.localWinRate, re.local2Rate,
-            re.motor2Rate, re.motor3Rate, re.boat2Rate,
-            re.avgSt, re.flyingCount, re.lateCount,
-            re.motorNumber, re.boatNumber2,
-            rb.exhibitionTime, rb.circuitTime, rb.tilt, rb.startTime, rb.winOdds,
-            rb.trifectaOdds, rb.startCourse,
+            re."nationalWinRate", re."national2Rate", re."national3Rate",
+            re."localWinRate", re."local2Rate",
+            re."motor2Rate", re."motor3Rate", re."boat2Rate",
+            re."avgSt", re."flyingCount", re."lateCount",
+            re."motorNumber", re."boatNumber2",
+            rb."exhibitionTime", rb."circuitTime", rb.tilt, rb."startTime", rb."winOdds",
+            rb."trifectaOdds", rb."startCourse",
             COALESCE(rb.stabilizer, 0) AS stabilizer,
             COALESCE(rb.weather, re.weather) AS weather,
-            COALESCE(rb.windDirection, re.windDirection) AS windDirection,
-            COALESCE(rb.windSpeed, re.windSpeed) AS windSpeed,
-            COALESCE(rb.waveHeight, re.waveHeight) AS waveHeight,
-            COALESCE(rb.waterTemp, re.waterTemp) AS waterTemp,
-            COALESCE(rb.airTemp, re.airTemp) AS airTemp
+            COALESCE(rb."windDirection", re."windDirection") AS "windDirection",
+            COALESCE(rb."windSpeed", re."windSpeed") AS "windSpeed",
+            COALESCE(rb."waveHeight", re."waveHeight") AS "waveHeight",
+            COALESCE(rb."waterTemp", re."waterTemp") AS "waterTemp",
+            COALESCE(rb."airTemp", re."airTemp") AS "airTemp"
         FROM (
             SELECT re_inner.*
             FROM race_entries re_inner
             INNER JOIN (
-                SELECT boatNumber, MAX(id) as max_id
+                SELECT "boatNumber", MAX(id) as max_id
                 FROM race_entries
-                WHERE raceDate=%s AND stadiumId=%s AND raceNumber=%s
-                  AND racerName != ''
-                GROUP BY boatNumber
+                WHERE "raceDate"=%s AND "stadiumId"=%s AND "raceNumber"=%s
+                  AND "racerName" != ''
+                GROUP BY "boatNumber"
             ) latest ON re_inner.id = latest.max_id
         ) re
         LEFT JOIN race_before_info rb
-          ON re.raceDate=rb.raceDate AND re.stadiumId=rb.stadiumId
-          AND re.raceNumber=rb.raceNumber AND re.boatNumber=rb.boatNumber
-        ORDER BY re.boatNumber
+          ON re."raceDate"=rb."raceDate" AND re."stadiumId"=rb."stadiumId"
+          AND re."raceNumber"=rb."raceNumber" AND re."boatNumber"=rb."boatNumber"
+        ORDER BY re."boatNumber"
     """, (race_date, stadium_id, race_number))
     rows = cursor.fetchall()
     cursor.close()
