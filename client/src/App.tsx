@@ -15,6 +15,7 @@ import SettingsPage from "./pages/SettingsPage";
 import SkipHistoryPage from "./pages/SkipHistoryPage";
 import OddsMonitorPage from "@/pages/OddsMonitorPage";
 import RecommendedRacesPage from "@/pages/RecommendedRacesPage";
+import Gacha from "@/pages/Gacha";
 
 function Router() {
   return (
@@ -31,6 +32,7 @@ function Router() {
         <Route path="/skip-history" component={SkipHistoryPage} />
         <Route path="/odds-monitor" component={OddsMonitorPage} />
         <Route path="/recommended" component={RecommendedRacesPage} />
+        <Route path="/gacha" component={Gacha} />
         <Route path="/404" component={NotFound} />
         <Route component={NotFound} />
       </Switch>
