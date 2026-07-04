@@ -1,6 +1,8 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
+import type { ReactNode } from "react";
+import { useEffect, useState } from "react";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
@@ -16,6 +18,66 @@ import SkipHistoryPage from "./pages/SkipHistoryPage";
 import OddsMonitorPage from "@/pages/OddsMonitorPage";
 import RecommendedRacesPage from "@/pages/RecommendedRacesPage";
 import Gacha from "@/pages/Gacha";
+
+type PublicStatus = "checking" | "enabled" | "disabled";
+
+function MaintenanceScreen() {
+  return (
+    <main
+      style={{
+        minHeight: "100vh",
+        display: "grid",
+        placeItems: "center",
+        background: "#0b1220",
+        color: "#f8fafc",
+        padding: 24,
+      }}
+    >
+      <section style={{ maxWidth: 480, textAlign: "center" }}>
+        <h1 style={{ fontSize: 28, fontWeight: 700, margin: 0 }}>現在メンテナンス中です</h1>
+        <p style={{ color: "#cbd5e1", lineHeight: 1.8, marginTop: 16 }}>
+          BETAKO is temporarily unavailable
+        </p>
+      </section>
+    </main>
+  );
+}
+
+function PublicStatusGate({ children }: { children: ReactNode }) {
+  const [status, setStatus] = useState<PublicStatus>("checking");
+
+  useEffect(() => {
+    let active = true;
+
+    const checkStatus = async () => {
+      try {
+        const response = await fetch("/api/public-status", { cache: "no-store" });
+        const data = await response.json();
+        if (!active) return;
+        setStatus(data?.publicEnabled === false ? "disabled" : "enabled");
+      } catch {
+        if (active) setStatus("enabled");
+      }
+    };
+
+    void checkStatus();
+    const intervalId = window.setInterval(checkStatus, 30_000);
+    return () => {
+      active = false;
+      window.clearInterval(intervalId);
+    };
+  }, []);
+
+  if (status === "disabled") {
+    return <MaintenanceScreen />;
+  }
+
+  if (status === "checking") {
+    return null;
+  }
+
+  return <>{children}</>;
+}
 
 function Router() {
   return (
@@ -46,7 +108,9 @@ function App() {
       <ThemeProvider defaultTheme="dark">
         <TooltipProvider>
           <Toaster />
-          <Router />
+          <PublicStatusGate>
+            <Router />
+          </PublicStatusGate>
         </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>

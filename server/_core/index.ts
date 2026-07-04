@@ -2,18 +2,24 @@ import "dotenv/config";
 import express from "express";
 import { createServer } from "http";
 import net from "net";
-import { execSync, execFile } from "child_process";
+import { execFile, execFileSync } from "child_process";
 import { promisify } from "util";
 import path from "path";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerOAuthRoutes } from "./oauth";
 import { appRouter } from "../routers";
+import { registerGachaBoatraceRoutes } from "../gachaBoatrace";
+import {
+  blockPublicPredictionTrpcWhenDisabled,
+  isBetakoPublicEnabled,
+} from "../publicAvailability";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 
 const execFileAsync = promisify(execFile);
 const SCRIPTS_DIR = path.resolve(process.cwd(), "scripts");
-const PYTHON_BIN = "/usr/bin/python3.11";
+const PYTHON_BIN = process.env.PYTHON_BIN || "python3";
+const PYTHON_DEPS_DIR = path.resolve(process.cwd(), ".python-packages");
 
 /** Pythonスクリプトを実行する共通ヘルパー */
 async function runScheduledPython(script: string, args: string[]): Promise<{ stdout: string; stderr: string }> {
@@ -22,6 +28,7 @@ async function runScheduledPython(script: string, args: string[]): Promise<{ std
     PATH: "/usr/bin:/bin:/usr/local/bin",
     HOME: process.env.HOME || "/home/ubuntu",
     TMPDIR: process.env.TMPDIR || "/tmp",
+    PYTHONPATH: PYTHON_DEPS_DIR,
     ...(process.env.DATABASE_URL ? { DATABASE_URL: process.env.DATABASE_URL } : {}),
     ...(process.env.SSL_CERT_FILE ? { SSL_CERT_FILE: process.env.SSL_CERT_FILE } : {}),
   };
@@ -200,7 +207,17 @@ function startReturnRateAlertScheduler() {
 function ensurePythonDeps() {
   const reqFile = path.resolve(process.cwd(), "scripts/requirements.txt");
   try {
-    execSync(`${PYTHON_BIN} -m pip install --user -q -r "${reqFile}"`, { stdio: "pipe" });
+    execFileSync(PYTHON_BIN, [
+      "-m",
+      "pip",
+      "install",
+      "--target",
+      PYTHON_DEPS_DIR,
+      "--upgrade",
+      "-q",
+      "-r",
+      reqFile,
+    ], { stdio: "pipe" });
     console.log("[Python] Dependencies verified.");
   } catch (e) {
     console.warn("[Python] Failed to install dependencies:", (e as Error).message);
@@ -240,8 +257,12 @@ async function startServer() {
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
+  app.get("/api/public-status", (_req, res) => {
+    res.json({ ok: true, publicEnabled: isBetakoPublicEnabled() });
+  });
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
+  registerGachaBoatraceRoutes(app);
   // tRPC API
 
   // ─── /api/schedule (Base44からのスケジュール取得用) ─────────────────────────
@@ -432,6 +453,7 @@ async function startServer() {
 
   app.use(
     "/api/trpc",
+    blockPublicPredictionTrpcWhenDisabled,
     createExpressMiddleware({
       router: appRouter,
       createContext,

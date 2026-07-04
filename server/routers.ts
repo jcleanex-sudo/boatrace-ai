@@ -34,9 +34,15 @@ import { STADIUMS } from "@shared/boatrace";
 
 const execFileAsync = promisify(execFile);
 const SCRIPTS_DIR = path.join(process.cwd(), "scripts");
+const PYTHON_DEPS_DIR = path.resolve(process.cwd(), ".python-packages");
+let pythonDepsVerified = false;
 
 // Pythonバイナリを動的に解決（本番環境でのENOENTエラー対策）
 function resolvePythonBin(): string {
+  if (process.env.PYTHON_BIN) {
+    return process.env.PYTHON_BIN;
+  }
+
   // whichコマンドでPATHから検索（本番環境のPATHに対応）
   const names = ["python3.11", "python3", "python"];
   for (const name of names) {
@@ -76,11 +82,58 @@ function resolvePythonBin(): string {
 }
 const PYTHON_BIN = resolvePythonBin();
 
+function ensurePythonDeps(pythonBin: string) {
+  if (pythonDepsVerified) return;
+
+  const reqFile = path.resolve(process.cwd(), "scripts/requirements.txt");
+  const env: NodeJS.ProcessEnv = {
+    ...process.env,
+    PATH: process.env.PATH || "/usr/bin:/bin:/usr/local/bin",
+    PYTHONPATH: PYTHON_DEPS_DIR,
+  };
+
+  try {
+    execFileSync(pythonBin, ["-c", "import numpy, pandas, sklearn, lightgbm, xgboost, joblib, lxml"], {
+      env,
+      timeout: 30_000,
+      stdio: "pipe",
+    });
+    pythonDepsVerified = true;
+    return;
+  } catch {
+    // Fall through and install into the project-local package directory.
+  }
+
+  try {
+    execFileSync(pythonBin, [
+      "-m",
+      "pip",
+      "install",
+      "--target",
+      PYTHON_DEPS_DIR,
+      "--upgrade",
+      "-q",
+      "-r",
+      reqFile,
+    ], {
+      env,
+      timeout: 300_000,
+      stdio: "pipe",
+    });
+    pythonDepsVerified = true;
+    console.log("[Python] Dependencies verified for tRPC runtime.");
+  } catch (err: any) {
+    const stderr = Buffer.isBuffer(err.stderr) ? err.stderr.toString("utf8") : "";
+    console.warn("[Python] Failed to verify dependencies for tRPC runtime:", stderr || err.message);
+  }
+}
+
 // Pythonスクリプトを実行するヘルパー
 async function runPython(script: string, args: string[], timeoutMs = 120_000): Promise<{ stdout: string; stderr: string }> {
   // 動的に解決したPythonバイナリを使用（本番環境でのENOENTエラー対策）
   const pythonBin = PYTHON_BIN;
   const scriptPath = path.join(SCRIPTS_DIR, script);
+  ensurePythonDeps(pythonBin);
   // 引数を配列として渡す（シェルインジェクション回避）
   const scriptArgs = args.flatMap(a => a.split(" "));
   console.log(`[runPython] CMD: ${pythonBin} ${scriptPath} ${scriptArgs.join(' ')}`);
@@ -90,6 +143,7 @@ async function runPython(script: string, args: string[], timeoutMs = 120_000): P
     PATH: "/usr/bin:/bin:/usr/local/bin",
     HOME: process.env.HOME || "/home/ubuntu",
     TMPDIR: process.env.TMPDIR || "/tmp",
+    PYTHONPATH: PYTHON_DEPS_DIR,
     // アプリケーション固有の環境変数のみ渡す
     ...(process.env.DATABASE_URL ? { DATABASE_URL: process.env.DATABASE_URL } : {}),
     ...(process.env.SSL_CERT_FILE ? { SSL_CERT_FILE: process.env.SSL_CERT_FILE } : {}),
