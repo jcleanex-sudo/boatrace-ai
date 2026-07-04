@@ -251,7 +251,7 @@ def load_race_data(conn, race_date: str, stadium_id: str, race_number: int) -> l
             INNER JOIN (
                 SELECT "boatNumber", MAX(id) as max_id
                 FROM race_entries
-                WHERE "raceDate"=%s AND "stadiumId"=%s AND "raceNumber"=%s
+                WHERE TO_CHAR("raceDate", 'YYYYMMDD')=%s AND "stadiumId"=%s AND "raceNumber"=%s
                   AND "racerName" != ''
                 GROUP BY "boatNumber"
             ) latest ON re_inner.id = latest.max_id
