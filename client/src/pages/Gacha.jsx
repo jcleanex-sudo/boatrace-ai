@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 
-const API      = "https://app-7164feb8.base44.app/functions/boatrace";
+const API      = "/api/gacha/boatrace";
 const GACHA_API = "https://app-7164feb8.base44.app/functions/gacha";
 
 const VENUE_NAMES = {
